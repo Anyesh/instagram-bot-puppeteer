@@ -14,7 +14,7 @@ async function timeout(ms) {
 }
 
 
-
+// Downloads top 12 memes from r/dankmemes/hot. 
 function download(){
     let num= 1  
     fetch('https://www.reddit.com/r/dankmemes/hot.json')
@@ -35,6 +35,7 @@ function download(){
     }).catch(error => console.error(error))
 }
 
+// loads cookies with username and password
 async function loadCookies(page){
     const previousSession = fs.existsSync(cookiesPath) 
     if (previousSession) { // kollar om cookies finns
@@ -51,7 +52,6 @@ async function loadCookies(page){
 }
 
 
-
 async function upload(num) {
 
     const selectors = {
@@ -64,14 +64,14 @@ async function upload(num) {
 
     const browser = await puppeteer.launch()
     const page = await browser.newPage()
-    await page.emulate(iphone)
+    await page.emulate(iphone) // now i get the mobile version of the website. 
 
-    // Laddar cookies
+    // Loads cookies
     loadCookies(page)
 
     await page.goto('https://instagram.com')
     
-    // POST KNAPPEN
+    // POST BUTTON
     try{
         await page.waitForSelector(selectors.post)
     }
@@ -82,15 +82,14 @@ async function upload(num) {
     await page.click(selectors.post)
     console.log("Post knappen")
 
-    // LADDAR UPP MEME
+    // UPPLOAD MEME
     const fileinput = await page.$('input[type=file]')
     await fileinput.uploadFile("./meme/" + num + ".jpg")
     console.log("laddar upp bild")
 
-    // EXPAND OCH NEXT KNAPPARNA 
+    // EXPAND AND NEXT BUTTONS 
 
-
-    try{ // kollar om expand knappen finns. 
+    try{ // this checks if you can zoom out the picture or not 
         await page.waitForSelector(selectors.expand)
         await page.click(selectors.expand)
         console.log("expand button found")
@@ -103,9 +102,9 @@ async function upload(num) {
     await page.click(selectors.next)
     console.log("Next knappen")
     
-    await timeout(2000)
+    await timeout(2000) // The next button and share button have the same selector. I delay here to be sure that the SHARE button is there. 
 
-    // SHARE KNAPPEN (SAMMA SELECTOR SOM NEXT)
+    // SHARE BUTTON (same SELECTOR as NEXT)
     console.log("Share knappen")
     try{
         await page.waitForSelector(selectors.next)
@@ -116,7 +115,7 @@ async function upload(num) {
     }
     await page.click(selectors.next)
 
-    // VÄNTAR SÅ BILDEN HINNER DELAS. 
+    // Waits for the picture to be shared 
     try{
         await page.waitForSelector(selectors.wait)
     }
@@ -130,7 +129,7 @@ async function upload(num) {
 
 
 
-console.log("startar upp..", new Date().getHours()+":"+new Date().getMinutes())
+console.log("startar upp..", new Date().getHours()+":"+new Date().getMinutes()) 
 let dwnld = false
 
 async function bot(){
@@ -146,6 +145,7 @@ async function bot(){
         picNum++
         await timeout(3600000)
     }
+    // after 12 hours download again
     await download()
     console.log("memes nedladdat. ")
     picNum = 1
